@@ -3,9 +3,12 @@
 <package format="3">
   <name>limit_switch</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="pi@georgebot.com">pi</maintainer>
+  <description>Publisher for limit switch data</description>
+  <maintainer email="jack-m@live.com">Jack</maintainer>
   <license>TODO: License declaration</license>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

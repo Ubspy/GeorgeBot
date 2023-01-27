@@ -13,13 +13,14 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='pi',
-    maintainer_email='pi@georgebot.com',
-    description='TODO: Package description',
+    maintainer='Jack',
+    maintainer_email='jack-m@live.com',
+    description='Publisher for limit switch data',
     license='TODO: License declaration',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'talker = switch_publisher.publisher_member_function:main',
         ],
     },
 )
