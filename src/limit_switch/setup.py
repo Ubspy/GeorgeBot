@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'talker = switch_publisher.publisher_member_function:main',
+            'talker = limit_switch.getSwitch:main',
         ],
     },
 )
