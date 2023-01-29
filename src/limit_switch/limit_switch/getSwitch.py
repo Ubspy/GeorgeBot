@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Bool
 
-import lgpio
+import RPi.GPIO as GPIO
 
 switchPin = 26
 
@@ -22,14 +22,17 @@ class SwitchPublisher(Node):
         # Create a timer that calls the member function timer_callback once every period
         self.timer = self.create_timer(period, self.timer_callback)
 
-        # Setup GPIO handler
-        self.handler = lgpio.gpiochip_open(0)
-        lgpio.gpio_claim_input(self.handler, switchPin)
+        # Setup GPIO
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(switchPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        
+        # Add interrupt handler
+        GPIO.add_event_detect(switchPin, GPIO.BOTH, callback=self.switch_interrupt, bouncetime=100)
 
-    def timer_callback(self):
+    def switch_interrupt(self):
         # Create a bool message and set it to if the switch is on or not
         msg = Bool()
-        msg.data = bool(lgpio.gpio_read(self.handler, switchPin))
+        msg.data = GPIO.input(switchPin)
 
         # Publish the message
         self.publisher_.publish(msg)
@@ -39,7 +42,7 @@ class SwitchPublisher(Node):
 
     def destroy_node(self):
         super().destroy_node()
-        lgpio.gpiochip_close(self.handler)
+        GPIO.cleanup()
 
 def main(args=None):
     rclpy.init(args=args)
