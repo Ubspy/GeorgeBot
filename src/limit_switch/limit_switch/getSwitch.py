@@ -19,7 +19,7 @@ class SwitchPublisher(Node):
 
         # Setup GPIO
         GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(switchPin, GPIO.IN, pull_up_down=GPIO.PUP_DOWN)
+        GPIO.setup(switchPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         
         # Add interrupt handler
         GPIO.add_event_detect(switchPin, GPIO.BOTH, callback=self.switch_interrupt, bouncetime=100)
