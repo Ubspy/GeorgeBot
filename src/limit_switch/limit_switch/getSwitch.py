@@ -16,12 +16,6 @@ class SwitchPublisher(Node):
         # message of type Bool, called "test_switch" and has a queue of 5
         self.publisher_ = self.create_publisher(Bool, 'test_switch', 5)
 
-        # TODO: Make this node work with interrupts
-        period = 0.5
-
-        # Create a timer that calls the member function timer_callback once every period
-        self.timer = self.create_timer(period, self.timer_callback)
-
         # Setup GPIO
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(switchPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
