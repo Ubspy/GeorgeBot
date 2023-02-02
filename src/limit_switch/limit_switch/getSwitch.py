@@ -24,7 +24,7 @@ class SwitchPublisher(Node):
         # Add interrupt handler
         GPIO.add_event_detect(switchPin, GPIO.BOTH, callback=self.switch_interrupt, bouncetime=100)
 
-    def switch_interrupt(self):
+    def switch_interrupt(self, channel):
         # Create a bool message and set it to if the switch is on or not
         msg = Bool()
 
