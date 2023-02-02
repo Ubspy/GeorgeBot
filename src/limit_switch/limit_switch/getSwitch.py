@@ -3,8 +3,9 @@ from rclpy.node import Node
 from std_msgs.msg import Bool
 
 import RPi.GPIO as GPIO
+from time import sleep
 
-switchPin = 26
+switchPin = 36
 
 class SwitchPublisher(Node):
     # Constructor for publisher node
@@ -18,7 +19,7 @@ class SwitchPublisher(Node):
 
         # Setup GPIO
         GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(switchPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(switchPin, GPIO.IN, pull_up_down=GPIO.PUP_DOWN)
         
         # Add interrupt handler
         GPIO.add_event_detect(switchPin, GPIO.BOTH, callback=self.switch_interrupt, bouncetime=100)
@@ -26,6 +27,11 @@ class SwitchPublisher(Node):
     def switch_interrupt(self):
         # Create a bool message and set it to if the switch is on or not
         msg = Bool()
+
+        # Need to sleep before getting the data or it will always read 0
+        sleep(0.005) 
+
+        # Set message data
         msg.data = GPIO.input(switchPin)
 
         # Publish the message
