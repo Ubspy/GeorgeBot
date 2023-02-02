@@ -32,7 +32,7 @@ class SwitchPublisher(Node):
         sleep(0.005) 
 
         # Set message data
-        msg.data = GPIO.input(switchPin)
+        msg.data = bool(GPIO.input(switchPin))
 
         # Publish the message
         self.publisher_.publish(msg)
