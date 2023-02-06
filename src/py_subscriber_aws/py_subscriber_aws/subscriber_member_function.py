@@ -14,36 +14,44 @@
 
 import rclpy
 from rclpy.node import Node
+import requests
 
 from std_msgs.msg import String
 
 
-class MinimalSubscriber(Node):
+class SwitchSubscriber(Node):
 
     def __init__(self):
-        super().__init__('minimal_subscriber')
+        super().__init__('switch_subscriber')
+        
+        #changed topic to 'test_switch and callback value to 5'
         self.subscription = self.create_subscription(
-            String,
-            'topic',
+            bool,
+            'test_switch',
             self.listener_callback,
-            10)
+            5)
         self.subscription  # prevent unused variable warning
 
+	
     def listener_callback(self, msg):
+        #get the data from the publisher and then send to the ec2 instance
         self.get_logger().info('I heard: "%s"' % msg.data)
-
-
+    #can either use get and post requests or just access a url like www.xyz.com/api/5018
+    #    x = requests.get('http://ec2-18-218-120-112.us-east-2.compute.amazonaws.com/')
+    #    r = requests.post( 'http://ec2-18-218-120-112.us-east-2.compute.amazonaws.com/',self.get_logger().info('EC2 heard: "%s"' % msg.data))
+        
+	
 def main(args=None):
     rclpy.init(args=args)
+    #changed name from minimal_subscriber to switchSubscriber
+    switch_subscriber = SwitchSubscriber()
 
-    minimal_subscriber = MinimalSubscriber()
-
-    rclpy.spin(minimal_subscriber)
+    rclpy.spin(switch_subscriber)
 
     # Destroy the node explicitly
     # (optional - otherwise it will be done automatically
     # when the garbage collector destroys the node object)
-    minimal_subscriber.destroy_node()
+    switch_subscriber.destroy_node()
     rclpy.shutdown()
 
 
