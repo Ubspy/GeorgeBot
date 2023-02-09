@@ -16,7 +16,7 @@ import rclpy
 from rclpy.node import Node
 import requests
 
-from std_msgs.msg import String
+from std_msgs.msg import bool
 
 
 class SwitchSubscriber(Node):
@@ -36,7 +36,10 @@ class SwitchSubscriber(Node):
     def listener_callback(self, msg):
         #get the data from the publisher and then send to the ec2 instance
         self.get_logger().info('I heard: "%s"' % msg.data)
-    #can either use get and post requests or just access a url like www.xyz.com/api/5018
+        r = requests.get('http://george-env.eba-trrm37cn.us-east-2.elasticbeanstalk.com/api/test/' + str(msg.data))
+        #get the website url and add the message contents to the url so it can be displayed on the website
+    #https://george-env.eba-trrm37cn.us-east-2.elasticbeanstalk.com/api/test/*INSERT_ANYTHING_HERE*
+  
     #    x = requests.get('http://ec2-18-218-120-112.us-east-2.compute.amazonaws.com/')
     #    r = requests.post( 'http://ec2-18-218-120-112.us-east-2.compute.amazonaws.com/',self.get_logger().info('EC2 heard: "%s"' % msg.data))
         
