@@ -16,7 +16,7 @@ import rclpy
 from rclpy.node import Node
 import requests
 
-from std_msgs.msg import bool
+from std_msgs.msg import Bool
 
 
 class SwitchSubscriber(Node):
@@ -26,7 +26,7 @@ class SwitchSubscriber(Node):
         
         #changed topic to 'test_switch and callback value to 5'
         self.subscription = self.create_subscription(
-            bool,
+            Bool,
             'test_switch',
             self.listener_callback,
             5)
