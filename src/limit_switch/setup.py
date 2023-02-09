@@ -11,7 +11,7 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
     ],
-    install_requires=['setuptools', 'lgpio'],
+    install_requires=['setuptools', 'RPi.GPIO'],
     zip_safe=True,
     maintainer='Jack',
     maintainer_email='jack-m@live.com',
