@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Move into project directory
+cd /home/pi/GeorgeBot
+
+# Delete all the directories to do with the ROS code
+rm -rf src build install log
+
+# Unzip the deploy tarball into the Georgebot dir
+tar -zxf deploy.tar.gz
+
+# Remove tarball
+rm deploy.tar.gz
+
+# Source into ros2
+source /opt/ros/foxy/setup.bash
+
+# Build the project
+echo ""
+echo "Building project..."
+colcon build
