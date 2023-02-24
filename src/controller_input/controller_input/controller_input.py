@@ -1,8 +1,11 @@
+import pygame
+import os
 import rclpy
-from rclpy.node import Node
-from pygame import event, joystick
 
 from controller_interface.msg import ControllerFrame
+from pygame import event, joystick
+from rclpy.node import Node
+
 
 class ControllerPublisher(Node):
     def __init__(self):
@@ -15,6 +18,9 @@ class ControllerPublisher(Node):
         self.current_frame = ControllerFrame()
 
         # Initialize controller input
+        os.environ["SDL_VIDEODRIVER"] = "dummy"
+        pygame.init()
+        pygame.display.init()
         joystick.init()
         self.controller = joystick.Joystick(0) # Get the 0th controller, I don't expect more than one
 
@@ -33,52 +39,49 @@ class ControllerPublisher(Node):
 
         # TODO: Read controller inputs and move them into self.prev_frame
         for currentEvent in event.get():
-            match currentEvent.type:
-                case JOYAXISMOTION:
-                    match currentEvent.axis:
-                        # Left Joystick
-                        case 0:
-                            self.current_frame.left_stick_x.value = currentEvent.value
-                        case 1:
-                            self.current_frame.left_stick_y.value = currentEvent.value
-                        # Right Joystick
-                        case 3:
-                            self.current_frame.right_stick_x.value = currentEvent.value
-                        case 4:
-                            self.current_frame.right_stick_y.value = currentEvent.value
-                        # Triggers
-                        case 2:
-                            self.current_frame.left_trigger.value = currentEvent.value
-                        case 5:
-                            self.current_frame.right_trigger.value = currentEvent.value
-                case JOYBUTTONUP | JOYBUTTONDOWN:
-                    match currentEvent.button:
-                        # Main 4
-                        case 0:
-                            self.current_frame.a.value = currentEvent.value
-                        case 1:
-                            self.current_frame.b.value = currentEvent.value
-                        case 2:
-                            self.current_frame.x.value = currentEvent.value
-                        case 3:
-                            self.current_frame.y.value = currentEvent.value
-                        # Bumpers
-                        case 4:
-                            self.current_frame.left_bumper.value = currentEvent.value
-                        case 5:
-                            self.current_frame.right_bumper.value = currentEvent.value
-                        # Silly Buttons
-                        case 6:
-                            self.current_frame.select.value = currentEvent.value
-                        case 7:
-                            self.current_frame.start.value = currentEvent.value
-                        case 10:
-                            self.current_frame.menu.value = currentEvent.value
-                        # Sticks
-                        case 8:
-                            self.current_frame.left_stick_down.value = currentEvent.value
-                        case 9:
-                            self.current_frame.right_stick_down.value = currentEvent.value
+            if currentEvent.type == pygame.JOYAXISMOTION:
+                # Left Joystick
+                if currentEvent.axis == 0:
+                    self.current_frame.left_stick_x.value = currentEvent.value
+                elif currentEvent.axis == 1:
+                    self.current_frame.left_stick_y.value = currentEvent.value
+                # Right Joystick
+                elif currentEvent.axis == 3:
+                    self.current_frame.right_stick_x.value = currentEvent.value
+                elif currentEvent.axis == 4:
+                    self.current_frame.right_stick_y.value = currentEvent.value
+                # Triggers
+                elif currentEvent.axis == 2:
+                    self.current_frame.left_trigger.value = currentEvent.value
+                elif currentEvent.axis == 5:
+                    self.current_frame.right_trigger.value = currentEvent.value
+            elif currentEvent.type == pygame.JOYBUTTONUP or currentEvent.type == pygame.JOYBUTTONDOWN:
+                # Main 4
+                if currentEvent.button == 0:
+                    self.current_frame.a.value = self.controller.get_button(0) == 1
+                elif currentEvent.button == 1:
+                    self.current_frame.b.value = self.controller.get_button(1) == 1
+                elif currentEvent.button == 2:
+                    self.current_frame.x.value = self.controller.get_button(2) == 1
+                elif currentEvent.button == 3:
+                    self.current_frame.y.value = self.controller.get_button(3) == 1
+                # Bumpers
+                elif currentEvent.button == 4:
+                    self.current_frame.left_bumper.value = self.controller.get_button(4) == 1
+                elif currentEvent.button == 5:
+                    self.current_frame.right_bumper.value = self.controller.get_button(5) == 1
+                # Silly Buttons
+                elif currentEvent.button == 6:
+                    self.current_frame.select.value = self.controller.get_button(6) == 1
+                elif currentEvent.button == 7:
+                    self.current_frame.start.value = self.controller.get_button(7) == 1
+                elif currentEvent.button == 10:
+                    self.current_frame.menu.value = self.controller.get_button(0) == 1
+                # Sticks
+                elif currentEvent.button == 8:
+                    self.current_frame.left_stick_down.value = self.controller.get_button(8) == 1
+                elif currentEvent.button == 9:
+                    self.current_frame.right_stick_down.value = self.controller.get_button(9) == 1
 
         # Return if our current frame is different from the previous one
         return tmp_frame == self.current_frame
