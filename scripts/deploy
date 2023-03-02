@@ -20,7 +20,7 @@ cd $PROJECT_DIR
 # Zip the src folder
 echo ""
 echo "Zipping the project..."
-tar -zcf deploy.tar.gz src
+tar -zcf deploy.tar.gz src launch
 
 # Upload the tarball to the pi in the project directory
 echo ""
