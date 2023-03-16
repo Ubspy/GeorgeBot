@@ -2,7 +2,7 @@ import pygame
 import os
 import rclpy
 
-from controller_interface.msg import ControllerFrame
+from georgebot_msgs.msg import ControllerFrame
 from pygame import event, joystick
 from rclpy.node import Node
 

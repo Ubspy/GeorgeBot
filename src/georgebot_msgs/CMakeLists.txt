@@ -22,6 +22,9 @@ find_package(rosidl_default_generators REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
     "msg/Direction.msg"
     "msg/IMUData.msg"
+    "msg/controller/Axis.msg"
+    "msg/controller/Button.msg"
+    "msg/controller/ControllerFrame.msg"
 )
 
 if(BUILD_TESTING)
