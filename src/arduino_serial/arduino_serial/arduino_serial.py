@@ -9,9 +9,6 @@ class ArduinoSerial(Node):
     def __init__(self):
         super().__init__('arduino_serial')
 
-        # Create period variable for timer and sleep
-        self.period = 0.1
-
         # Set subscriber
         self.subscription = self.create_subscription(
                 Direction,
@@ -29,12 +26,6 @@ class ArduinoSerial(Node):
         self.ser = serial.Serial('/dev/ttyACM0', 9600, timeout=0.1)
         self.ser.flush()
 
-        # Set timer to read in from serial
-        self.timer = self.create_timer(self.period, self.arduino_data_recv)
-
-        # Create rate for sleeping in the case of out buffer being full
-        self.rate = self.create_rate(1 / self.period, self.get_clock())
-    
     def arduino_data_recv(self):
         # Check if there's any data waiting
         if(self.ser.in_waiting > 0):
