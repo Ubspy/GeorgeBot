@@ -1,3 +1,4 @@
+import copy
 import pygame
 import os
 import rclpy
@@ -12,7 +13,7 @@ class ControllerPublisher(Node):
         super().__init__('controller_publisher')
         self.publisher_ = self.create_publisher(ControllerFrame, 'controller', 10)
 
-        timer_period = 0.1
+        timer_period = 0.05
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
         self.current_frame = ControllerFrame()
@@ -25,19 +26,19 @@ class ControllerPublisher(Node):
         self.controller = joystick.Joystick(0) # Get the 0th controller, I don't expect more than one
 
     def timer_callback(self):
-        # TODO: Read controller inputs into current frame
-
         # We only want to publish when the controller values change, otherwise we're flooding the topic with info no one cares about
-        if self.read_controller():
+        if not self.read_controller():
             # Publish current frame to the topic
             self.publisher_.publish(self.current_frame)
             self.get_logger().info("Published controller frame")
 
     def read_controller(self):
         # Save current frame to compare to last
-        tmp_frame = self.current_frame
+        # We need to use the copy library because if we use a direct assign then
+        # both objects will be edited
+        tmp_frame = copy.deepcopy(self.current_frame)
 
-        # TODO: Read controller inputs and move them into self.prev_frame
+        # Read controller inputs and move them into self.prev_frame
         for currentEvent in event.get():
             if currentEvent.type == pygame.JOYAXISMOTION:
                 # Left Joystick
@@ -85,7 +86,7 @@ class ControllerPublisher(Node):
 
         # Return if our current frame is different from the previous one
         return tmp_frame == self.current_frame
-
+ 
 def main(args=None):
     rclpy.init(args=args)
     controller_publisher = ControllerPublisher()
