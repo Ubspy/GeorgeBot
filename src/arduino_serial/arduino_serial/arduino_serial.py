@@ -19,12 +19,20 @@ class ArduinoSerial(Node):
         # Suppress unused warning
         self.subscription
 
+        # Timer for checking serial input
+        self.period = 0.1
+
         # Set publisher
         self.publisher = self.create_publisher(IMUData, 'imu_data', 10)
+
+        # Create timer callback for arduino receive
+        self.timer = self.create_timer(self.period, self.arduino_data_recv)
 
         # Initialize serial and get rid of bogus data
         self.ser = serial.Serial('/dev/ttyACM0', 9600, timeout=0.1)
         self.ser.flush()
+
+        self.get_logger().info('READY')
 
     def arduino_data_recv(self):
         # Check if there's any data waiting
