@@ -13,14 +13,14 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='root',
-    maintainer_email='root@todo.todo',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    maintainer='Jack Moren',
+    maintainer_email='jack-m@live.com',
+    description='Sends movement commands to the arduino via serial connection',
+    license='BSD',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'arduino_serial = arduino_serial.arduino_serial:main'
+            'bidirectional = arduino_serial.arduino_serial:main'
         ],
     },
 )
