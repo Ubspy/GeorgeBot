@@ -4,8 +4,8 @@ import serial
 
 from georgebot_msgs.msg import Direction 
 from georgebot_msgs.msg import IMUData
-from rclpy.node import Node
 from rcl_interfaces.msg import ParameterDescriptor
+from rclpy.node import Node
 
 class ArduinoSerial(Node):
     def __init__(self):
@@ -24,7 +24,8 @@ class ArduinoSerial(Node):
                 Direction,
                 'move_direction',
                 self.arduino_data_send,
-                10)
+                10
+        )
 
         # Suppress unused warning
         self.subscription
@@ -86,6 +87,8 @@ class ArduinoSerial(Node):
             to_pub.y_encoder_right = int(ser_data[4])
             to_pub.x_accel = float(ser_data[5])
             to_pub.y_accel = float(ser_data[6])
+
+            self.publisher.publish(to_pub)
 
     def arduino_data_send(self, msg):
         # Create variable to store serial wait value
