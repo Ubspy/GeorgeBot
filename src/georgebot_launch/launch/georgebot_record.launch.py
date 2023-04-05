@@ -7,8 +7,9 @@ from launch_ros.actions import Node
 from launch.actions import IncludeLaunchDescription 
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
-# This is the production launch file, it will need every node Georgebot needs for running around and making a map
-# TODO: Add octomap and slam
+# This is the launch file for running Georgebot with the intent of recording data to work on mapping offline
+# Since the TF transforms are recorded as is with the bag, the time stamp will not be the same as what the mapping programs expect
+# Because of that, we will be recording everything as nomral but omitting the odometry (this will be run offline later)
 
 def generate_launch_description():
     controller_input = IncludeLaunchDescription(
@@ -29,19 +30,10 @@ def generate_launch_description():
             'arduino_serial.launch.py']),
         launch_arguments={'serial_port': '/dev/ttyACM0', 'baud_rate': '9600'}.items()
     )
-
-    odometry = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('odometry'), 'launch/'),
-            'odometry.launch.py']),
-        launch_arguments={'wheel_diameter': '10'}.items()
-    )
-
     return LaunchDescription([
         controller_input,
         teleop_control,
         arduino_serial,
-        odometry,
         Node(
             package='tf2_ros',
             name='odom_to_map',

@@ -11,6 +11,7 @@ class Odometry(Node):
     def __init__(self):
         super().__init__('odometry')
 
+        # Parameter for wheel diameter
         pc_diameter = ParameterDescriptor(description="Whe diameter of the robots wheels in cemtimeters")
         self.declare_parameter('wheel_diameter', 100, pc_diameter)
 
