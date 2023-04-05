@@ -47,6 +47,8 @@ class Odometry(Node):
         transform.transform.rotation.z = 0.0
         transform.transform.rotation.w = 1.0
 
+        self.get_logger().info("Publishing x transform: %d" % x_displacement)
+
         self.tf_broadcaster.sendTransform(transform)
 
 def main(args=None):

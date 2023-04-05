@@ -31,7 +31,7 @@ class ArduinoSerial(Node):
         self.subscription
 
         # Timer for checking serial input
-        self.period = 0.1
+        self.period = 0.01
 
         # Set publisher
         self.publisher = self.create_publisher(IMUData, 'imu_data', 10)
