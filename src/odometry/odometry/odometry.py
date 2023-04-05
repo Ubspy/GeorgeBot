@@ -29,11 +29,11 @@ class Odometry(Node):
         self.wheel_diameter = self.get_parameter('wheel_diameter').get_parameter_value().integer_value
 
     def transform_frame(self, msg):
-        left_encoder_val = msg.x_encoder_left
+        left_encoder_val = msg.x_encoder_left * -1
         right_encoder_val = msg.x_encoder_right
 
-        avg_encoder_val = (left_encoder_val + right_encoder_val) / 2
-        x_displacement = (self.wheel_diameter * math.pi) * avg_encoder_val
+        avg_encoder_val = (left_encoder_val + right_encoder_val) / 2.0
+        x_displacement = (self.wheel_diameter / 100.0 * math.pi) * avg_encoder_val / 480.0
 
         transform = TransformStamped()
         transform.header.stamp = self.get_clock().now().to_msg()
