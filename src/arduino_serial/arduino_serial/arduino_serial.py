@@ -5,6 +5,8 @@ import serial
 from georgebot_msgs.msg import Direction 
 from georgebot_msgs.msg import IMUData
 from rcl_interfaces.msg import ParameterDescriptor
+from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 
 class ArduinoSerial(Node):
@@ -36,7 +38,7 @@ class ArduinoSerial(Node):
         # Set publisher
         self.publisher = self.create_publisher(IMUData, 'imu_data', 10)
 
-        # Create timer callback for arduino receive
+        # Create timer callback for arduino receive 
         self.timer = self.create_timer(self.period, self.arduino_data_recv)
 
         # Get parameter values and store them locally
@@ -112,7 +114,10 @@ def main(args=None):
     rclpy.init(args=args)
     arduino_serial = ArduinoSerial()
 
-    rclpy.spin(arduino_serial)
+    # Create a multithreaded executor so multiple instances of data processing can happen at once
+    executor = MultiThreadedExecutor(num_threads=4)
+    executor.add_node(arduino_serial)
+    executor.spin()
 
     arduino_serial.destroy_node()
     rclpy.shutdown()

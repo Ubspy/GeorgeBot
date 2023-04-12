@@ -12,8 +12,11 @@ class Odometry(Node):
         super().__init__('odometry')
 
         # Parameter for wheel diameter
-        pc_diameter = ParameterDescriptor(description="Whe diameter of the robots wheels in cemtimeters")
+        pc_diameter = ParameterDescriptor(description="The diameter of the robots wheels in millimeters")
         self.declare_parameter('wheel_diameter', 100, pc_diameter)
+
+        pc_error = ParameterDescriptor(description="The average percent of how much wheel power actually equates to movement")
+        self.declare_parameter('wheel_error', 0.9, pc_error)
 
         self.subscription = self.create_subscription(
             IMUData,
@@ -26,15 +29,15 @@ class Odometry(Node):
 
         self.tf_broadcaster = TransformBroadcaster(self)
 
-        # TODO: This shouldn't be int
         self.wheel_diameter = self.get_parameter('wheel_diameter').get_parameter_value().integer_value
+        self.wheel_error = self.get_parameter('wheel_error').get_parameter_value().double_value
 
     def transform_frame(self, msg):
         left_encoder_val = msg.x_encoder_left * -1
         right_encoder_val = msg.x_encoder_right
 
         avg_encoder_val = (left_encoder_val + right_encoder_val) / 2.0
-        x_displacement = (self.wheel_diameter / 100.0 * math.pi) * avg_encoder_val / 480.0
+        x_displacement = -1.0 * (self.wheel_diameter / 1000.0 * math.pi) * avg_encoder_val / 48.0 * self.wheel_error
 
         transform = TransformStamped()
         transform.header.stamp = self.get_clock().now().to_msg()
