@@ -30,10 +30,19 @@ def generate_launch_description():
             'arduino_serial.launch.py']),
         launch_arguments={'serial_port': '/dev/ttyACM0', 'baud_rate': '9600'}.items()
     )
+
+    lidar = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([os.path.join(
+            get_package_share_directory('cyglidar_d1'), 'launch/'),
+            'cyglidar.launch.py']),
+        launch_arguments={'version': '0'}
+    )
+
     return LaunchDescription([
         controller_input,
         teleop_control,
         arduino_serial,
+        lidar,
         Node(
             package='tf2_ros',
             name='odom_to_map',

@@ -1,0 +1,3 @@
+[submodule "src/cyglidar_d1"]
+	path = src/cyglidar_d1
+	url = https://github.com/CygLiDAR-ROS/cyglidar_d1

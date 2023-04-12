@@ -37,11 +37,19 @@ def generate_launch_description():
         launch_arguments={'wheel_diameter': '10'}.items()
     )
 
+    lidar = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([os.path.join(
+            get_package_share_directory('cyglidar_d1'), 'launch/'),
+            'cyglidar.launch.py']),
+        launch_arguments={'version': '0'}
+    )
+
     return LaunchDescription([
         controller_input,
         teleop_control,
         arduino_serial,
         odometry,
+        lidar,
         Node(
             package='tf2_ros',
             name='odom_to_map',
