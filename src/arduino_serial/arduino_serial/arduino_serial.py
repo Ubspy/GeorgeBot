@@ -83,8 +83,8 @@ class ArduinoSerial(Node):
             to_pub.yaw = float(ser_data[0])
             to_pub.x_encoder_left = int(ser_data[1])
             to_pub.x_encoder_right = int(ser_data[2])
-            to_pub.y_encoder_left = int(ser_data[3])
-            to_pub.y_encoder_right = int(ser_data[4])
+            to_pub.y_encoder_front = int(ser_data[3])
+            to_pub.y_encoder_back = int(ser_data[4])
             to_pub.x_accel = float(ser_data[5])
             to_pub.y_accel = float(ser_data[6])
 
