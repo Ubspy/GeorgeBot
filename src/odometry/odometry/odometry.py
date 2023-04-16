@@ -65,12 +65,14 @@ class Odometry(Node):
         transform.header.frame_id = 'odom'
         transform.child_frame_id = 'base_link'
         transform.transform.translation.x = x_displacement
-        transform.transform.translation.y = 0.0
+        transform.transform.translation.y = y_displacement
         transform.transform.translation.z = 0.0
+        # X and Z are always 0
         transform.transform.rotation.x = 0.0
-        transform.transform.rotation.y = 0.0
         transform.transform.rotation.z = 0.0
-        transform.transform.rotation.w = 1.0
+        # TODO: Test this
+        transform.transform.rotation.y = math.sin(theta / 2.0)
+        transform.transform.rotation.w = math.cos(theta / 2.0)
 
         # Log that we published our transform
         self.get_logger().info("Publishing x transform: %f" % x_displacement)
