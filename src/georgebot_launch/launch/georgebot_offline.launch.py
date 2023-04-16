@@ -23,6 +23,10 @@ def generate_launch_description():
     return LaunchDescription([
         odometry,
         Node(
+            package='lidar_filter',
+            executable='filter'
+        ),
+        Node(
             package='tf2_ros',
             name='odom_to_map',
             executable='static_transform_publisher',

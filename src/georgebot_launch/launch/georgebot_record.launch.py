@@ -35,30 +35,12 @@ def generate_launch_description():
         PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('cyglidar_d1'), 'launch/'),
             'cyglidar.launch.py']),
-        launch_arguments={'version': '0'}
+        launch_arguments={'version': '0'}.items()
     )
 
     return LaunchDescription([
         controller_input,
         teleop_control,
         arduino_serial,
-        lidar,
-        Node(
-            package='tf2_ros',
-            name='odom_to_map',
-            executable='static_transform_publisher',
-            arguments=['0', '0', '0', '0', '0', '0', 'map', 'odom']
-        ),
-        Node(
-            package='tf2_ros',
-            name='base_to_odom',
-            executable='static_transform_publisher',
-            arguments=['0', '0', '0', '0', '0', '0', 'odom', 'base_link']
-        ),
-        Node(
-            package='tf2_ros',
-            name='laser_to_base',
-            executable='static_transform_publisher',
-            arguments=['0', '0', '0.25', '0', '0', '0.707', '0.707', 'base_link', 'laser_link']
-        ), 
+        lidar
     ])
