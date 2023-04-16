@@ -16,7 +16,10 @@ class Odometry(Node):
         self.declare_parameter('wheel_diameter', 100, pc_diameter)
 
         pc_error = ParameterDescriptor(description="The average percent of how much wheel power actually equates to movement")
-        self.declare_parameter('wheel_error', 0.9, pc_error)
+        self.declare_parameter('wheel_error', 0.85, pc_error)
+
+        pc_counts = ParameterDescriptor(description="How many times the motor encoder counts for one revolution")
+        self.declare_parameter('encoder_rev_count', 48, pc_counts)
 
         # Set up subscription to imu_data
         self.subscription = self.create_subscription(
@@ -32,6 +35,7 @@ class Odometry(Node):
         # Maybe change wheel diameter to not be an int? idk
         self.wheel_diameter = self.get_parameter('wheel_diameter').get_parameter_value().integer_value
         self.wheel_error = self.get_parameter('wheel_error').get_parameter_value().double_value
+        self.counts_per_rev = self.get_parameter('encoder_rev_count').get_parameter().integer_value
 
     def transform_frame(self, msg):
         # The left encoder is reversed, since they spin opposite directions relative to the motors
@@ -55,9 +59,8 @@ class Odometry(Node):
         # However, no wheel is perfect so we want a coeffecient of how much of the wheel spin equates to actual movement
         # Now thi should set us up perfectly but for some reason stuff in RVIZ moved way more than it was supposed to
         # Our lidar point clouds would barely be moving while the TF was flying across, so I divided by an extra factor of 10
-        # TODO: Make some of this stuff into parameters
-        x_displacement = (self.wheel_diameter / 1000.0 * math.pi) * avg_x_encoder_val / (48.0 * 10.0) * 0.85
-        y_displacement = (self.wheel_diameter / 1000.0 * math.pi) * avg_y_encoder_val / (48.0 * 10.0) * 0.85
+        x_displacement = (self.wheel_diameter / 1000.0 * math.pi) * avg_x_encoder_val / (self.encoder_rev_count * 10.0) * self.wheel_error
+        y_displacement = (self.wheel_diameter / 1000.0 * math.pi) * avg_y_encoder_val / (self.encoder_rev_count * 10.0) * self.wheel_error
          
         # Now that we have our displacement create a tranform between odom and base_link based off what we just calculated
         transform = TransformStamped()
