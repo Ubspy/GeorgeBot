@@ -13,17 +13,22 @@ class ControllerPublisher(Node):
         super().__init__('controller_publisher')
         self.publisher_ = self.create_publisher(ControllerFrame, 'controller', 10)
 
+        # Create timer with period of 0.05 seconds, every period we call the callback function
         timer_period = 0.05
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
+        # Keep a controller frame as a member variable so we can compare the newest controller frame to the previous one
         self.current_frame = ControllerFrame()
 
         # Initialize controller input
+        # We need to set an os environment variable for pygame because it does NOT like to run without a gui
         os.environ["SDL_VIDEODRIVER"] = "dummy"
         pygame.init()
         pygame.display.init()
         joystick.init()
-        self.controller = joystick.Joystick(0) # Get the 0th controller, I don't expect more than one
+
+        # Get the 0th controller, I don't expect more than one
+        self.controller = joystick.Joystick(0) 
 
     def timer_callback(self):
         # We only want to publish when the controller values change, otherwise we're flooding the topic with info no one cares about
@@ -39,6 +44,10 @@ class ControllerPublisher(Node):
         tmp_frame = copy.deepcopy(self.current_frame)
 
         # Read controller inputs and move them into self.prev_frame
+        # Full disclosure, I have no idea if we need to compare each individual element of the controller object
+        # I did this because before it wasn't correctly showing that the frames were different
+        # The issue ended up being that we needed a deep copy because it ended up using a reference to the previous controller frame
+        # I'm kind of too scared to change this and it's gross but oh well
         for currentEvent in event.get():
             if currentEvent.type == pygame.JOYAXISMOTION:
                 # Left Joystick
@@ -57,7 +66,7 @@ class ControllerPublisher(Node):
                 elif currentEvent.axis == 5:
                     self.current_frame.right_trigger.value = currentEvent.value
             elif currentEvent.type == pygame.JOYBUTTONUP or currentEvent.type == pygame.JOYBUTTONDOWN:
-                # Main 4
+                # Main 4 buttons
                 if currentEvent.button == 0:
                     self.current_frame.a.value = self.controller.get_button(0) == 1
                 elif currentEvent.button == 1:

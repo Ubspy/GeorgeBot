@@ -29,9 +29,6 @@ class ArduinoSerial(Node):
                 10
         )
 
-        # Suppress unused warning
-        self.subscription
-
         # Timer for checking serial input
         self.period = 0.01
 
@@ -52,6 +49,7 @@ class ArduinoSerial(Node):
 
             # Log that serial has been established
             self.get_logger().info("Serial communication has been established on port %s with baud rate %i" % (self.serial_port, self.baud_rate))
+        # L python linter error saying serialutil isn't a thing when it is
         except serial.serialutil.SerialException:
             self.serial_error_catch()
 
@@ -62,8 +60,8 @@ class ArduinoSerial(Node):
         # Wait for there to be a file at the serial location
         serial_port_present = False
 
+        # Wait for this serial port to appear
         while(not serial_port_present):
-            # Wait for this serial port to appear
             serial_port_present = os.path.isfile(self.serial_port.value)
         
         # Once that's done send an info message
