@@ -17,7 +17,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('odometry'), 'launch/'),
             'odometry.launch.py']),
-        launch_arguments={'wheel_diameter': '10'}.items()
+        launch_arguments={'wheel_diameter': '100'}.items()
     )
 
     return LaunchDescription([
