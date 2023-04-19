@@ -8,7 +8,7 @@ class LidarJson(Node):
         super().__init__('lidar_json')
         self.subscription = self.create_subscription(
                 PointCloud2,
-                'cloud_in',
+                'scan_3D',
                 self.lisener_callback,
                 10)
         self.subscription

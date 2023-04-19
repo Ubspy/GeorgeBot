@@ -41,7 +41,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('cyglidar_d1'), 'launch/'),
             'cyglidar.launch.py']),
-        launch_arguments={'version': '0'}
+        launch_arguments={'version': '0'}.items()
     )
 
     return LaunchDescription([
