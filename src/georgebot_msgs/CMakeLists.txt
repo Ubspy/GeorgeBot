@@ -25,6 +25,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
     "msg/controller/Axis.msg"
     "msg/controller/Button.msg"
     "msg/controller/ControllerFrame.msg"
+    "srv/ControllerQuery.srv"
 )
 
 if(BUILD_TESTING)

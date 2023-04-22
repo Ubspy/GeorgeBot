@@ -6,7 +6,6 @@ def generate_launch_description():
     # Return launch description for the controller input node
     return LaunchDescription([
         Node(
-            package='AWS_client',
-            executable='AWS_client'
-        )
+            package='AWS_Client',
+            executable='client
     ])

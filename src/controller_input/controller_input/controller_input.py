@@ -4,6 +4,7 @@ import os
 import rclpy
 
 from georgebot_msgs.msg import ControllerFrame
+from georgebot_msgs.srv import ControllerQuery
 from pygame import event, joystick
 from rclpy.node import Node
 
@@ -12,7 +13,12 @@ class ControllerPublisher(Node):
     def __init__(self):
         super().__init__('controller_publisher')
         self.publisher_ = self.create_publisher(ControllerFrame, 'controller', 10)
+<<<<<<< Updated upstream
 
+=======
+        self.srv = self.create_service(ControllerQuery, 'controller', 10)
+        # Create timer with period of 0.05 seconds, every period we call the callback function
+>>>>>>> Stashed changes
         timer_period = 0.05
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
@@ -23,8 +29,20 @@ class ControllerPublisher(Node):
         pygame.init()
         pygame.display.init()
         joystick.init()
+<<<<<<< Updated upstream
         self.controller = joystick.Joystick(0) # Get the 0th controller, I don't expect more than one
 
+=======
+
+        # Get the 0th controller, I don't expect more than one
+        self.controller = joystick.Joystick(0) 
+    def service_request(self):
+        return(self.get_logger().Info('Incoming request\na:', self.current_frame))
+        
+        #self.get_logger().Info('Incoming request\na:', self.controller)
+        
+    
+>>>>>>> Stashed changes
     def timer_callback(self):
         # We only want to publish when the controller values change, otherwise we're flooding the topic with info no one cares about
         if not self.read_controller():
