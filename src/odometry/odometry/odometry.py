@@ -36,13 +36,13 @@ class Odometry(Node):
     def transform_frame(self, msg):
         # The left encoder is reversed, since they spin opposite directions relative to the motors
         # TODO: Is there a better way to do this like a parameter?
-        left_encoder_val = msg.x_encoder_left * -1
+        left_encoder_val = msg.x_encoder_left * -1.0
         right_encoder_val = msg.x_encoder_right
-        front_encoder_val = msg.y_encoder_front * -1
-        back_encoder_val = msg.y_encoder_back
+        front_encoder_val = msg.y_encoder_front
+        back_encoder_val = msg.y_encoder_back * -1.0
 
-        # Get the current angle of the robot
-        theta = msg.yaw
+        # Get the current angle of the robot, the angle is given to us as an angle and we need radians
+        theta = msg.yaw * 2 * math.pi / 360.0
 
         # Take average x encoder value
         avg_x_encoder_val = (left_encoder_val + right_encoder_val) / 2.0
@@ -69,9 +69,8 @@ class Odometry(Node):
         transform.transform.translation.z = 0.0
         # X and Z are always 0
         transform.transform.rotation.x = 0.0
-        transform.transform.rotation.z = 0.0
-        # TODO: Test this
-        transform.transform.rotation.y = math.sin(theta / 2.0)
+        transform.transform.rotation.y = 0.0
+        transform.transform.rotation.z = math.sin(theta / 2.0)
         transform.transform.rotation.w = math.cos(theta / 2.0)
 
         # Log that we published our transform
