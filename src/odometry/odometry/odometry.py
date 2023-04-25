@@ -33,13 +33,21 @@ class Odometry(Node):
         self.wheel_diameter = self.get_parameter('wheel_diameter').get_parameter_value().integer_value
         self.wheel_error = self.get_parameter('wheel_error').get_parameter_value().double_value
 
+        self.prev_left_encoder_val = 0
+        self.prev_right_encoder_val = 0
+        self.prev_front_encoder_val = 0
+        self.prev_back_encoder_val = 0
+
+        self.x_displacement = 0
+        self.y_displacement = 0
+
     def transform_frame(self, msg):
         # The left encoder is reversed, since they spin opposite directions relative to the motors
         # TODO: Is there a better way to do this like a parameter?
-        left_encoder_val = msg.x_encoder_left * -1.0
-        right_encoder_val = msg.x_encoder_right
-        front_encoder_val = msg.y_encoder_front
-        back_encoder_val = msg.y_encoder_back * -1.0
+        left_encoder_val = msg.x_encoder_left - self.prev_left_encoder_val
+        right_encoder_val = msg.x_encoder_right * -1.0 - self.prev_right_encoder_val
+        front_encoder_val = msg.y_encoder_front * -1.0 - self.prev_front_encoder_val
+        back_encoder_val = msg.y_encoder_back - self.prev_back_encoder_val
 
         # Get the current angle of the robot, the angle is given to us as an angle and we need radians
         theta = msg.yaw * 2 * math.pi / 360.0
@@ -56,26 +64,34 @@ class Odometry(Node):
         # Now thi should set us up perfectly but for some reason stuff in RVIZ moved way more than it was supposed to
         # Our lidar point clouds would barely be moving while the TF was flying across, so I divided by an extra factor of 10
         # TODO: Make some of this stuff into parameters
-        x_displacement = (self.wheel_diameter / 1000.0 * math.pi) * avg_x_encoder_val / (48.0 * 10.0) * 0.85
-        y_displacement = (self.wheel_diameter / 1000.0 * math.pi) * avg_y_encoder_val / (48.0 * 10.0) * 0.85
+        x_displacement_no_angle = (self.wheel_diameter / 1000.0 * math.pi) * avg_x_encoder_val / (48.0 * 10.0) * 0.85
+        y_displacement_no_angle = (self.wheel_diameter / 1000.0 * math.pi) * avg_y_encoder_val / (48.0 * 10.0) * 0.85
+
+        self.x_displacement += x_displacement_no_angle * math.cos(theta) + y_displacement_no_angle * math.sin(theta)
+        self.y_displacement += y_displacement_no_angle * math.cos(theta) + x_displacement_no_angle * math.sin(theta)
+
+        self.prev_left_encoder_val = msg.x_encoder_left 
+        self.prev_right_encoder_val = msg.x_encoder_right * -1.0
+        self.prev_front_encoder_val = msg.y_encoder_front * -1.0
+        self.prev_back_encoder_val = msg.y_encoder_back 
          
         # Now that we have our displacement create a tranform between odom and base_link based off what we just calculated
         transform = TransformStamped()
         transform.header.stamp = self.get_clock().now().to_msg()
         transform.header.frame_id = 'odom'
         transform.child_frame_id = 'base_link'
-        transform.transform.translation.x = x_displacement
-        transform.transform.translation.y = y_displacement
+        transform.transform.translation.x = self.x_displacement
+        transform.transform.translation.y = self.y_displacement
         transform.transform.translation.z = 0.0
         # X and Z are always 0
         transform.transform.rotation.x = 0.0
         transform.transform.rotation.y = 0.0
-        transform.transform.rotation.z = math.sin(theta / 2.0)
-        transform.transform.rotation.w = math.cos(theta / 2.0)
+        transform.transform.rotation.z = math.sin(-1.0 * theta / 2.0)
+        transform.transform.rotation.w = math.cos(-1.0 * theta / 2.0)
 
         # Log that we published our transform
-        self.get_logger().info("Publishing x transform: %f" % x_displacement)
-        self.get_logger().info("Publishing y transform: %f" % y_displacement)
+        self.get_logger().info("Publishing x transform: %f" % self.x_displacement)
+        self.get_logger().info("Publishing y transform: %f" % self.y_displacement)
         self.get_logger().info("Publishing angle transform: %f" % theta)
 
         # Send out transform to the transform broadcaster
