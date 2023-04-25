@@ -5,6 +5,8 @@ import serial
 from georgebot_msgs.msg import Direction 
 from georgebot_msgs.msg import IMUData
 from rcl_interfaces.msg import ParameterDescriptor
+from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 
 class ArduinoSerial(Node):
@@ -27,16 +29,13 @@ class ArduinoSerial(Node):
                 10
         )
 
-        # Suppress unused warning
-        self.subscription
-
         # Timer for checking serial input
         self.period = 0.01
 
         # Set publisher
         self.publisher = self.create_publisher(IMUData, 'imu_data', 10)
 
-        # Create timer callback for arduino receive
+        # Create timer callback for arduino receive 
         self.timer = self.create_timer(self.period, self.arduino_data_recv)
 
         # Get parameter values and store them locally
@@ -50,6 +49,7 @@ class ArduinoSerial(Node):
 
             # Log that serial has been established
             self.get_logger().info("Serial communication has been established on port %s with baud rate %i" % (self.serial_port, self.baud_rate))
+        # L python linter error saying serialutil isn't a thing when it is
         except serial.serialutil.SerialException:
             self.serial_error_catch()
 
@@ -60,8 +60,8 @@ class ArduinoSerial(Node):
         # Wait for there to be a file at the serial location
         serial_port_present = False
 
+        # Wait for this serial port to appear
         while(not serial_port_present):
-            # Wait for this serial port to appear
             serial_port_present = os.path.isfile(self.serial_port.value)
         
         # Once that's done send an info message
@@ -83,8 +83,8 @@ class ArduinoSerial(Node):
             to_pub.yaw = float(ser_data[0])
             to_pub.x_encoder_left = int(ser_data[1])
             to_pub.x_encoder_right = int(ser_data[2])
-            to_pub.y_encoder_left = int(ser_data[3])
-            to_pub.y_encoder_right = int(ser_data[4])
+            to_pub.y_encoder_front = int(ser_data[3])
+            to_pub.y_encoder_back = int(ser_data[4])
             to_pub.x_accel = float(ser_data[5])
             to_pub.y_accel = float(ser_data[6])
 
@@ -112,7 +112,10 @@ def main(args=None):
     rclpy.init(args=args)
     arduino_serial = ArduinoSerial()
 
-    rclpy.spin(arduino_serial)
+    # Create a multithreaded executor so multiple instances of data processing can happen at once
+    executor = MultiThreadedExecutor(num_threads=4)
+    executor.add_node(arduino_serial)
+    executor.spin()
 
     arduino_serial.destroy_node()
     rclpy.shutdown()

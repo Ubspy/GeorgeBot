@@ -16,9 +16,6 @@ class TeleopMovementController(Node):
                 self.process_controller_input,
                 10)
 
-        # Suppress unused warning
-        self.subscription
-
         # Create publisher to publish movement data
         self.publisher = self.create_publisher(Direction, 'move_direction', 10)
 
@@ -35,10 +32,12 @@ class TeleopMovementController(Node):
         to_send = Direction()
 
         # Set values
+        # TODO: We should maybe limit max speed because if it goes too fast we can't get accurage data
         to_send.x = local_x
         to_send.y = local_y
         to_send.theta = local_theta
 
+        # Send a log
         self.get_logger().info('SENDING MOVEMENT')
 
         # Publish direction message

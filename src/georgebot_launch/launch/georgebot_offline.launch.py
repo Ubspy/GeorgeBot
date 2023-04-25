@@ -7,41 +7,17 @@ from launch_ros.actions import Node
 from launch.actions import IncludeLaunchDescription 
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
-# This is the production launch file, it will need every node Georgebot needs for running around and making a map
-# TODO: Add octomap and slam
+# This is the launch file for when re've recorded data from the robot and wish to work on the mapping without the actual robot present
+# Since we aren't actively controlling the robot, we don't need any of the nodes for movement control
+# Odometry is needed because we need to have the timestamps on the TF be the same as the current time stamp
+# TODO: Add lidar republishing
 
 def generate_launch_description():
-    controller_input = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('controller_input'), 'launch/'),
-            'controller_input.launch.py'])
-    )
-
-    teleop_control = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('teleop_movement_control'), 'launch/'),
-            'teleop_movement.launch.py'])
-    )
-
-    arduino_serial = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('arduino_serial'), 'launch/'),
-            'arduino_serial.launch.py']),
-        launch_arguments={'serial_port': '/dev/ttyACM0', 'baud_rate': '9600'}.items()
-    )
-
     odometry = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('odometry'), 'launch/'),
             'odometry.launch.py']),
-        launch_arguments={'wheel_diameter': '10', 'wheel_error': '0.9'}.items()
-    )
-
-    lidar = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('georgebot_launch'), 'launch/'),
-            'cyglidar_georgebot.launch.py']),
-        launch_arguments={'version': '0'}.items()
+        launch_arguments={'wheel_diameter': '100'}.items()
     )
 
     slam = IncludeLaunchDescription(
@@ -57,13 +33,13 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        controller_input,
-        teleop_control,
-        arduino_serial,
         odometry,
-        lidar,
         slam,
         pc2_to_laser,
+        Node(
+            package='lidar_filter',
+            executable='filter'
+        ),
         Node(
             package='tf2_ros',
             name='odom_to_map',
@@ -80,6 +56,7 @@ def generate_launch_description():
             package='tf2_ros',
             name='laser_to_base',
             executable='static_transform_publisher',
-            arguments=['0', '0', '0.25', '0', '0', '0.707', '0.707', 'base_link', 'laser_link']
+            arguments=['0', '0', '0', '0', '0', '0', 'base_link', 'laser_link']
+            #arguments=['0', '0', '0.25', '0', '0', '0.707', '0.707', 'base_link', 'laser_link']
         ), 
     ])
