@@ -1,37 +1,33 @@
+
 import copy
-import pygame
+import rclpy
 import os
 import rclpy
 
-from georgebot_msgs.msg import ControllerFrame
+
+import georgebot_msgs.msg import ControllerFrame
 from pygame import event, joystick
 from rclpy.node import Node
 
 
-class ControllerPublisher(Node):
+class ControllerService(Node):
+
     def __init__(self):
-        super().__init__('controller_publisher')
-        self.publisher_ = self.create_publisher(ControllerFrame, 'controller', 10)
-
-        # Create timer with period of 0.05 seconds, every period we call the callback function
-        timer_period = 0.05
-        self.timer = self.create_timer(timer_period, self.timer_callback)
-
-        # Keep a controller frame as a member variable so we can compare the newest controller frame to the previous one
-        self.current_frame = ControllerFrame()
-
-        # Initialize controller input
-        # We need to set an os environment variable for pygame because it does NOT like to run without a gui
-        os.environ["SDL_VIDEODRIVER"] = "dummy"
-        pygame.init()
-        pygame.display.init()
-        joystick.init()
-
-        # Get the 0th controller, I don't expect more than one
-        self.controller = joystick.Joystick(0) 
-    
+        super().__init__('minimal_service')
+        self.srv = self.create_service(ControllerFrame, 'controller', 10)
+	
+	timer_period = 0.05
+	self.timer = self.create_timer(timer_period, self.timer_callback)
+	
+	
+	os.environ["SDL_VIDEODRIVER"] = "dummy"
+	pygame.init()
+	pygame.display.init()
+	joystick.init()
+	
+		
     def timer_callback(self):
-        # We only want to publish when the controller values change, otherwise we're flooding the topic with info no one cares about
+   	# We only want to publish when the controller values change, otherwise we're flooding the topic with info no one cares about
         if not self.read_controller():
             # Publish current frame to the topic
             self.publisher_.publish(self.current_frame)
@@ -95,14 +91,13 @@ class ControllerPublisher(Node):
 
         # Return if our current frame is different from the previous one
         return tmp_frame == self.current_frame
- 
-def main(args=None):
-    rclpy.init(args=args)
-    controller_publisher = ControllerPublisher()
-    rclpy.spin(controller_publisher)
-
-    controller_publisher.destroy_node()
+        
+def main():
+    rclpy.init()
+    controller_service = ControllerService()
+    rclpy.spin(controller_service)
     rclpy.shutdown()
+
 
 if __name__ == '__main__':
     main()
