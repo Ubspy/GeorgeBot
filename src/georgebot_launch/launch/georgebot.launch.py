@@ -40,8 +40,20 @@ def generate_launch_description():
     lidar = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('georgebot_launch'), 'launch/'),
-            'georgebot_cyglidar.launch.py']),
+            'cyglidar_georgebot.launch.py']),
         launch_arguments={'version': '0'}.items()
+    )
+
+    slam = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([os.path.join(
+            get_package_share_directory('georgebot_launch'), 'launch/'),
+            'georgebot_slam.launch.py']),
+    )
+
+    pc2_to_laser = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([os.path.join(
+            get_package_share_directory('georgebot_launch'), 'launch/'),
+            'georgebot_pc2_to_laser.launch.py']),
     )
 
     return LaunchDescription([
@@ -50,6 +62,8 @@ def generate_launch_description():
         arduino_serial,
         odometry,
         lidar,
+        slam,
+        pc2_to_laser,
         Node(
             package='tf2_ros',
             name='odom_to_map',

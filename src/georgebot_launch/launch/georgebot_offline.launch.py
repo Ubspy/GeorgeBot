@@ -20,8 +20,22 @@ def generate_launch_description():
         launch_arguments={'wheel_diameter': '100'}.items()
     )
 
+    slam = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([os.path.join(
+            get_package_share_directory('georgebot_launch'), 'launch/'),
+            'georgebot_slam.launch.py']),
+    )
+
+    pc2_to_laser = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([os.path.join(
+            get_package_share_directory('georgebot_launch'), 'launch/'),
+            'georgebot_pc2_to_laser.launch.py']),
+    )
+
     return LaunchDescription([
         odometry,
+        slam,
+        pc2_to_laser,
         Node(
             package='lidar_filter',
             executable='filter'
@@ -42,6 +56,7 @@ def generate_launch_description():
             package='tf2_ros',
             name='laser_to_base',
             executable='static_transform_publisher',
-            arguments=['0', '0', '0.25', '0', '0', '0.707', '0.707', 'base_link', 'laser_link']
+            arguments=['0', '0', '0', '0', '0', '0', 'base_link', 'laser_link']
+            #arguments=['0', '0', '0.25', '0', '0', '0.707', '0.707', 'base_link', 'laser_link']
         ), 
     ])
