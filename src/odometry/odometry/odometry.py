@@ -50,7 +50,7 @@ class Odometry(Node):
         back_encoder_val = msg.y_encoder_back - self.prev_back_encoder_val
 
         # Get the current angle of the robot, the angle is given to us as an angle and we need radians
-        theta = msg.yaw * 2 * math.pi / 360.0
+        theta = -1.0 * msg.yaw * 2 * math.pi / 360.0 * 0.95
 
         # Take average x encoder value
         avg_x_encoder_val = (left_encoder_val + right_encoder_val) / 2.0
@@ -86,8 +86,8 @@ class Odometry(Node):
         # X and Z are always 0
         transform.transform.rotation.x = 0.0
         transform.transform.rotation.y = 0.0
-        transform.transform.rotation.z = math.sin(-1.0 * theta / 2.0)
-        transform.transform.rotation.w = math.cos(-1.0 * theta / 2.0)
+        transform.transform.rotation.z = math.sin(theta / 2.0)
+        transform.transform.rotation.w = math.cos(theta / 2.0)
 
         # Log that we published our transform
         self.get_logger().info("Publishing x transform: %f" % self.x_displacement)

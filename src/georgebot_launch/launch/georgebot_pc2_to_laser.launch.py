@@ -8,7 +8,7 @@ from launch_ros.actions import Node
 def generate_launch_description():
     return LaunchDescription([
         Node(
-            package='pointcloud_to_laserscan', node_executable='pointcloud_to_laserscan_node',
+            package='pointcloud_to_laserscan', executable='pointcloud_to_laserscan_node',
             # This package needs the incoming pointcloud2 to be named 'cloud_in' so we remap our pc2 to that name
             # The output is named 'scan' and we do a similar thing
             remappings=[('cloud_in', 'scan_2D_filtered'), ('scan', 'scan_filtered')],
@@ -26,6 +26,6 @@ def generate_launch_description():
                 'use_inf': True,
                 'inf_epsilon': 1.0
             }],
-            node_name='pointcloud_to_laserscan'
+            name='pointcloud_to_laserscan'
         )
     ])
